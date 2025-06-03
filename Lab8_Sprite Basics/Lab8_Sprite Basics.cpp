@@ -4,7 +4,6 @@
 #include <allegro5/allegro_image.h> ///include the header to initialize the image addon
 #include <allegro5/allegro_native_dialog.h>
 #include <iostream>
-# define M_PI           3.14159265358979323846  /* pi */
 
 int main(int argc, char** argv) {
 
@@ -19,14 +18,21 @@ int main(int argc, char** argv) {
 
 	float sprite_x = SCREEN_W / 2.0 - sprite_SIZE / 2.0;
 	float sprite_y = SCREEN_H / 2.0 - sprite_SIZE / 2.0;
-	float sprite_dx = -4.0, sprite_dy = 4.0;
+	float sprite_dx = 0, sprite_dy = 4.0;
+
 	float angle = 0; // added angle
 	bool turning = false; // added rotation check
+
 	bool redraw = true;
 	ALLEGRO_BITMAP* image = NULL;
 	ALLEGRO_BITMAP* sprite = NULL;
 
 	if (!al_init()) {
+		return -1;
+	}
+
+	if (!al_install_keyboard()) {
+		std::cerr << "Failed to initialize the keyboard!\n";
 		return -1;
 	}
 
@@ -38,6 +44,10 @@ int main(int argc, char** argv) {
 	display = al_create_display(SCREEN_W, SCREEN_H);
 	if (!display) {
 		al_destroy_timer(timer);
+		return -1;
+	}
+	if (!al_install_keyboard()) {
+		std::cerr << "Failed to initialize the keyboard!\n";
 		return -1;
 	}
 
@@ -59,6 +69,10 @@ int main(int argc, char** argv) {
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 
+	al_register_event_source(event_queue, al_get_keyboard_event_source());
+
+	al_register_event_source(event_queue, al_get_timer_event_source(timer));
+
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 
 	al_flip_display();
@@ -72,7 +86,7 @@ int main(int argc, char** argv) {
 
 
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
-
+			
 			if (!turning) {
 
 				sprite_x += sprite_dx;
@@ -105,6 +119,20 @@ int main(int argc, char** argv) {
 
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			break;
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+		{
+			switch (ev.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_LEFT:
+				sprite_dx = -4;
+				turning = false;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				sprite_dx = 4;
+				turning = false;
+				break;
+			}
 		}
 
 		if (redraw && al_is_event_queue_empty(event_queue)) {
