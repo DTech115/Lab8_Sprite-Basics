@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 	const float FPS = 60;
 	const int SCREEN_W = 640;
 	const int SCREEN_H = 480;
-	const int sprite_SIZE = 32;
+	const int sprite_SIZE = 64;
 	ALLEGRO_DISPLAY* display = NULL;
 	ALLEGRO_EVENT_QUEUE* event_queue = NULL;
 	ALLEGRO_TIMER* timer = NULL;
@@ -24,7 +24,6 @@ int main(int argc, char** argv) {
 
 	float angle = 0; // added angle
 	bool turning = false; // added rotation check
-	int flip = 0;
 
 	bool redraw = true;
 	ALLEGRO_BITMAP* image = NULL;
@@ -57,9 +56,8 @@ int main(int argc, char** argv) {
 
 
 	al_init_image_addon();
-	image = al_load_bitmap("cool.png");
-	sprite = al_load_bitmap("reimu.jpg");
-	//al_convert_mask_to_alpha(sprite, al_map_rgb(255, 0, 255));
+	image = al_load_bitmap("pond.png");
+	sprite = al_load_bitmap("forg.png");
 	event_queue = al_create_event_queue();
 	if (!event_queue) {
 		al_destroy_bitmap(sprite);
@@ -108,14 +106,14 @@ int main(int argc, char** argv) {
 
 				if (sprite_x < 0) {
 					angle += 0.1;
-					if (angle >= M_PI) {
+					if (angle >= M_PI/2) {
 						sprite_dx = 4;
 						turning = false;
 					}
 				}
 				else if (sprite_x > SCREEN_W - sprite_SIZE) {
 					angle -= 0.1;
-					if (angle <= 0) {
+					if (angle <= -M_PI/2) {
 						sprite_dx = -4;
 						turning = false;
 					}
@@ -148,29 +146,25 @@ int main(int argc, char** argv) {
 				sprite_dx = -4;
 				sprite_dy = 0;
 				turning = false;
-				angle = 0;
-				flip = false;
+				angle = -M_PI/2;
 				break;
 			case ALLEGRO_KEY_RIGHT:
 				sprite_dx = 4;
 				sprite_dy = 0;
 				turning = false;
-				angle = M_PI;
-				flip = ALLEGRO_FLIP_VERTICAL;
+				angle = M_PI/2;
 				break;
 			case ALLEGRO_KEY_UP:
 				sprite_dy = -4;
 				sprite_dx = 0;
 				turning = false;
 				angle = 0;
-				flip = 0;
 				break;
 			case ALLEGRO_KEY_DOWN:
 				sprite_dy = 4;
 				sprite_dx = 0;
 				turning = false;
-				angle = M_PI;
-				flip = ALLEGRO_FLIP_HORIZONTAL;
+				angle = -M_PI;
 				break;
 			}
 		}
@@ -180,7 +174,7 @@ int main(int argc, char** argv) {
 
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 			al_draw_bitmap(image, 0, 0, 0);
-			al_draw_rotated_bitmap(sprite, 16, 16, sprite_x + 16, sprite_y + 16, angle, flip);
+			al_draw_rotated_bitmap(sprite, 32, 32, sprite_x + 32, sprite_y + 32, angle, 0);
 			al_flip_display();
 		}
 	}
