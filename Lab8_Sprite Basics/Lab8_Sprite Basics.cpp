@@ -4,6 +4,7 @@
 #include <allegro5/allegro_image.h> ///include the header to initialize the image addon
 #include <allegro5/allegro_native_dialog.h>
 #include <iostream>
+# define M_PI           3.14159265358979323846  /* pi */
 
 int main(int argc, char** argv) {
 
@@ -18,10 +19,12 @@ int main(int argc, char** argv) {
 
 	float sprite_x = SCREEN_W / 2.0 - sprite_SIZE / 2.0;
 	float sprite_y = SCREEN_H / 2.0 - sprite_SIZE / 2.0;
-	float sprite_dx = 0, sprite_dy = 4.0;
+
+	float sprite_dx = 0, sprite_dy = 0; //reset to 0 for starting
 
 	float angle = 0; // added angle
 	bool turning = false; // added rotation check
+	int flip = 0;
 
 	bool redraw = true;
 	ALLEGRO_BITMAP* image = NULL;
@@ -55,7 +58,7 @@ int main(int argc, char** argv) {
 
 	al_init_image_addon();
 	image = al_load_bitmap("cool.png");
-	sprite = al_load_bitmap("dvd.png");
+	sprite = al_load_bitmap("reimu.jpg");
 	//al_convert_mask_to_alpha(sprite, al_map_rgb(255, 0, 255));
 	event_queue = al_create_event_queue();
 	if (!event_queue) {
@@ -90,9 +93,14 @@ int main(int argc, char** argv) {
 			if (!turning) {
 
 				sprite_x += sprite_dx;
+				sprite_y += sprite_dy;
 
 				if (sprite_x < 0 || sprite_x > SCREEN_W - sprite_SIZE) {
 					sprite_dx = 0;
+					turning = true;
+				}
+				else if (sprite_y < 0 || sprite_y > SCREEN_H - sprite_SIZE) {
+					sprite_dy = 0;
 					turning = true;
 				}
 			}
@@ -100,7 +108,7 @@ int main(int argc, char** argv) {
 
 				if (sprite_x < 0) {
 					angle += 0.1;
-					if (angle >= 3) {
+					if (angle >= M_PI) {
 						sprite_dx = 4;
 						turning = false;
 					}
@@ -111,13 +119,25 @@ int main(int argc, char** argv) {
 						sprite_dx = -4;
 						turning = false;
 					}
+				} else if (sprite_y < 0) {
+					angle += 0.1;
+					if (angle >= M_PI) {
+						sprite_dy = 4;
+						turning = false;
+					}
+				}
+				else if (sprite_y > SCREEN_H - sprite_SIZE) {
+					angle -= 0.1;
+					if (angle <= 0) {
+						sprite_dy = -4;
+						turning = false;
+					}
 				}
 			}
 
 			redraw = true;
-		}
 
-		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+		} else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			break;
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
@@ -126,11 +146,31 @@ int main(int argc, char** argv) {
 			{
 			case ALLEGRO_KEY_LEFT:
 				sprite_dx = -4;
+				sprite_dy = 0;
 				turning = false;
+				angle = 0;
+				flip = false;
 				break;
 			case ALLEGRO_KEY_RIGHT:
 				sprite_dx = 4;
+				sprite_dy = 0;
 				turning = false;
+				angle = M_PI;
+				flip = ALLEGRO_FLIP_VERTICAL;
+				break;
+			case ALLEGRO_KEY_UP:
+				sprite_dy = -4;
+				sprite_dx = 0;
+				turning = false;
+				angle = 0;
+				flip = 0;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				sprite_dy = 4;
+				sprite_dx = 0;
+				turning = false;
+				angle = M_PI;
+				flip = ALLEGRO_FLIP_HORIZONTAL;
 				break;
 			}
 		}
@@ -140,7 +180,7 @@ int main(int argc, char** argv) {
 
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 			al_draw_bitmap(image, 0, 0, 0);
-			al_draw_rotated_bitmap(sprite, 16, 16, sprite_x + 16, sprite_y + 16, angle, 0);
+			al_draw_rotated_bitmap(sprite, 16, 16, sprite_x + 16, sprite_y + 16, angle, flip);
 			al_flip_display();
 		}
 	}
