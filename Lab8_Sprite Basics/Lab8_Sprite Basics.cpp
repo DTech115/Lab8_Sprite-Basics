@@ -71,28 +71,22 @@ int main(int argc, char** argv) {
 
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
 
-
-			if (sprite_dx == 0 && angle < 3)
-			{
-				angle += .1;
-			}
-			if (sprite_dx == (SCREEN_W - sprite_SIZE) && angle >= 0) {
-				angle -= .1;
-			}
+			sprite_x += sprite_dx;
 
 			if (sprite_x < 0 || sprite_x > SCREEN_W - sprite_SIZE) {
+				sprite_dx = 0;
+				if (sprite_dx == 0 && angle < 3) {
+					angle += .1;
+				}
+				if (sprite_dx == (SCREEN_W - sprite_SIZE) && angle >= 0) {
+					angle -= .1;
+				}
 				sprite_dx = -sprite_dx;
 			}
 
-			if (sprite_y < 0 || sprite_y > SCREEN_H - sprite_SIZE) {
-				sprite_dy = -sprite_dy;
-			}
-
-			sprite_x += sprite_dx;
-			sprite_y += sprite_dy;
-
 			redraw = true;
 		}
+
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			break;
 		}
@@ -102,7 +96,7 @@ int main(int argc, char** argv) {
 
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 			al_draw_bitmap(image, 0, 0, 0);
-			al_draw_bitmap(sprite, sprite_x, sprite_y, 0);
+			al_draw_rotated_bitmap(sprite, 16, 16, sprite_x + 16, sprite_y + 16, angle, 0);
 			al_flip_display();
 		}
 	}
