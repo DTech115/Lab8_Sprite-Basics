@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
 	float sprite_y = SCREEN_H / 2.0 - sprite_SIZE / 2.0;
 	float sprite_dx = -4.0, sprite_dy = 4.0;
 	float angle = 0; // added angle
+	bool turning = false; // added rotation check
 	bool redraw = true;
 	ALLEGRO_BITMAP* image = NULL;
 	ALLEGRO_BITMAP* sprite = NULL;
@@ -69,19 +70,34 @@ int main(int argc, char** argv) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
 
+
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
 
-			sprite_x += sprite_dx;
+			if (!turning) {
 
-			if (sprite_x < 0 || sprite_x > SCREEN_W - sprite_SIZE) {
-				sprite_dx = 0;
-				if (sprite_dx == 0 && angle < 3) {
-					angle += .1;
+				sprite_x += sprite_dx;
+
+				if (sprite_x < 0 || sprite_x > SCREEN_W - sprite_SIZE) {
+					sprite_dx = 0;
+					turning = true;
 				}
-				if (sprite_dx == (SCREEN_W - sprite_SIZE) && angle >= 0) {
-					angle -= .1;
+			}
+			else {
+
+				if (sprite_x < 0) {
+					angle += 0.1;
+					if (angle >= 3) {
+						sprite_dx = 4;
+						turning = false;
+					}
 				}
-				sprite_dx = -sprite_dx;
+				else if (sprite_x > SCREEN_W - sprite_SIZE) {
+					angle -= 0.1;
+					if (angle <= 0) {
+						sprite_dx = -4;
+						turning = false;
+					}
+				}
 			}
 
 			redraw = true;
