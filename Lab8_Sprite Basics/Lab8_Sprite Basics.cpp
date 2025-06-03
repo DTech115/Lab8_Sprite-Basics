@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
 				sprite_dy = 4;
 				sprite_dx = 0;
 				turning = false;
-				angle = -M_PI;
+				angle = M_PI;
 				break;
 			}
 		}
